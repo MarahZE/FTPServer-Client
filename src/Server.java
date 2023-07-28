@@ -9,7 +9,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 
 public class Server {
 
@@ -62,9 +61,14 @@ public class Server {
                         show.setPreferredSize(new Dimension(50,75));
                         show.setFont(new Font("Arial",Font.BOLD,20));
 
+                        JButton remove = new JButton("remove");
+                        remove.setPreferredSize(new Dimension(50,75));
+                        remove.setFont(new Font("Arial",Font.BOLD,20));
+
                         filePanel.add(labelFileName);
                         filePanel.add(show);
                         filePanel.add(download);
+                        filePanel.add(remove);
                         panel.add(filePanel);
                         frame.validate();
                         System.out.println(nameOfFile);
@@ -162,25 +166,24 @@ public class Server {
                             }
                         });
 
+
+                        remove.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                filePanel.remove(labelFileName);
+                                filePanel.remove(download);
+                                filePanel.remove(show);
+                                filePanel.remove(remove);
+                                filePanel.revalidate();
+                                filePanel.repaint();
+                            }
+                        });
+
                     }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-
-    }
-
-    public static String showContent(byte[] content, String nameFile) {
-        int i = nameFile.lastIndexOf(".");
-
-        String fileExtension = nameFile.substring(i);
-
-        if(fileExtension.equalsIgnoreCase(".txt")) {
-            return new String(content);
-        } else {
-
-            return "";
         }
 
     }
