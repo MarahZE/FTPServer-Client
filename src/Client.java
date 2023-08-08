@@ -14,15 +14,16 @@ public class Client {
     public static void main(String[] args) {
         final File[] ftpFile = new File[1];
 
+        // Set up client GUI layout
         JFrame jFrame = new JFrame("FTP Client");
         jFrame.setSize(700,500);
         jFrame.setLayout(new BoxLayout(jFrame.getContentPane(),BoxLayout.Y_AXIS));
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        // Create components and buttons
         JLabel title = new JLabel("Welcome to FTP Client!");
         title.setFont(new Font("Arial",Font.BOLD,23));
         title.setBorder(new EmptyBorder(20,0,30,0));
-        //title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JPanel jPanelChoseFile = new JPanel();
         jPanelChoseFile.setBorder(new EmptyBorder(10,0,10,0));
@@ -53,9 +54,12 @@ public class Client {
         jFrame.add(jPanel);
         jFrame.setVisible(true);
 
+
+        // ActionListener for choosing a file
         jbChooseFile.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // Open a file chooser dialog and store the selected file in ftpFile
                 JFileChooser chooser = new JFileChooser();
                 chooser.setDialogTitle("Choose a file!");
                 if(chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
@@ -65,13 +69,17 @@ public class Client {
             }
         });
 
+
+        // ActionListener for sending the file
         jbSender.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if(ftpFile[0] == null) {
+                    // Display an error message if no file is selected
                     fileNameLabel.setText("You have to select file first!");
                 } else {
                     try {
+                        // Read the selected file and prepare to send it
                         FileInputStream fileInputStream = new FileInputStream(ftpFile[0].getAbsolutePath());
 
                         Socket socket = new Socket("localhost",1234);
@@ -85,15 +93,19 @@ public class Client {
                         byte[] ftpFileContentSize = new byte[(int) ftpFile[0].length()];
                         fileInputStream.read(ftpFileContentSize);
 
-                        //send to the server how many data will be sent
+                        // Send the size of the file name to the server
                         output.writeInt(ftpFileSize.length);
-                        //send data
+                        // Send the file name
                         output.write(ftpFileSize);
-                        //send to the server how many data will be sent
+                        // Send the size of the file content to the server
                         output.writeInt(ftpFileContentSize.length);
-                        //sent data
+                        // Send the file content
                         output.write(ftpFileContentSize);
 
+                        // Close the streams and socket
+                        output.close();
+                        fileInputStream.close();
+                        socket.close();
                     } catch (IOException error) {
                         error.printStackTrace();
                     }

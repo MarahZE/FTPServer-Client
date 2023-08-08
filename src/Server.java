@@ -14,6 +14,7 @@ public class Server {
 
     public static void main(String[] args) throws IOException {
 
+        // Set up the server layout
         JFrame frame = new JFrame("FTPServer");
         frame.setSize(700,900);
         frame.setLayout(new BoxLayout(frame.getContentPane(),BoxLayout.Y_AXIS));
@@ -30,15 +31,21 @@ public class Server {
         frame.add(scroll);
         frame.setVisible(true);
 
+
+        // Create a server socket for communication
         ServerSocket serverSocket = new ServerSocket(1234);
+
 
         while (true) {
             try {
+                // Accept incoming client connections
                 Socket socket = serverSocket.accept();
+                // Read client data
                 DataInputStream input = new DataInputStream(socket.getInputStream());
 
                 int ftpFileNLength = input.readInt();
 
+                // Process received data and update layout
                 if(ftpFileNLength >0) {
                     byte[] ftpNameSize = new byte[ftpFileNLength];
                     input.readFully(ftpNameSize,0,ftpNameSize.length);
@@ -73,6 +80,7 @@ public class Server {
                         frame.validate();
                         System.out.println(nameOfFile);
 
+                        // Show the content of the file
                         show.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
@@ -91,11 +99,15 @@ public class Server {
                                 String fileExtension = nameOfFile.substring(i);
 
                                 if(fileExtension.equalsIgnoreCase(".txt")) {
-                                    fileNameLabel.setText(new String(contentSize));
+                                    fileNameLabel.setText("<html>"+new String(contentSize)+"</html>");
                                 } else if (fileExtension.equalsIgnoreCase(".png") || fileExtension.equalsIgnoreCase(".jpg")){
-                                    fileNameLabel.setIcon(new ImageIcon(contentSize));
-                                } else if (fileExtension.equalsIgnoreCase(".pdf")) {
-
+                                    ImageIcon origin = new ImageIcon(contentSize);
+                                    int width = 500;
+                                    int height = 600;
+                                    Image resizedImage = origin.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
+                                    fileNameLabel.setIcon(new ImageIcon(resizedImage));
+                                } else {
+                                    fileNameLabel.setText("Could not open file.");
                                 }
 
                                 newFrame.add(fileNameLabel);
@@ -105,6 +117,7 @@ public class Server {
                             }
                         });
 
+                        // Download the file
                         download.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
@@ -120,7 +133,6 @@ public class Server {
                                 JLabel jLabel = new JLabel("Are you sure to download " + nameOfFile);
                                 jLabel.setFont(new Font("Arial",Font.BOLD,18));
                                 jLabel.setBorder(new EmptyBorder(20,0,20,0));
-                                //jLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
                                 newPanel.add(jLabel);
 
 
@@ -134,7 +146,6 @@ public class Server {
                                 No.setFont(new Font("Arial",Font.BOLD,20));
                                 newPanel.add(No);
 
-                                //contentPanel.add(newPanel);
 
                                 newFrame.add(newPanel);
                                 newFrame.setVisible(true);
@@ -145,7 +156,6 @@ public class Server {
                                         newFrame.dispose();
                                     }
                                 });
-
                                 yes.addActionListener(new ActionListener() {
                                     @Override
                                     public void actionPerformed(ActionEvent e) {
@@ -167,6 +177,7 @@ public class Server {
                         });
 
 
+                        // Remove the file
                         remove.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
